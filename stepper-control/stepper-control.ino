@@ -15,6 +15,8 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+
+int _joysteps = 8;
 void setup() {
 Serial.begin(9600);
 Serial.setTimeout (100);
@@ -37,8 +39,8 @@ int Disable_movement()
 {PORTD=PORTD|B10000000;
 return 0;
   }
-int ChooseMotor(int choice, int dir, int steps)
-{int MovSpeed=1;
+int ChooseMotor(int choice, int dir, int steps, int MovSpeed=1)
+{
   
  if (choice==1)TurnOnMotorX(dir, steps,MovSpeed);
  if (choice==2)TurnOnMotorY(dir, steps,MovSpeed);
@@ -99,13 +101,13 @@ joyx=analogRead(0);
 joyy=analogRead(1);
 joyp=analogRead(2);
 Serial.print(joyy);
-if (joyx>800 ||joyx<200 ||joyy>800|| joyy<200) isready=4;
+if (joyx>600 ||joyx<400 ||joyy>600|| joyy<400) isready=4;
 
 if(isready==0) {Serial.write("Motor X/Y/Z 1/2/3: \n");
-do{choice= Serial.readStringUntil('\n').toInt();isready=1;}while(choice==0 && (analogRead(0)<800&&analogRead(0)>200)&&(analogRead(1)<800&&analogRead(1)>200));  
+do{choice= Serial.readStringUntil('\n').toInt();isready=1;}while(choice==0 && (analogRead(0)<600&&analogRead(0)>400)&&(analogRead(1)<600&&analogRead(1)>400));  
 if (choice==0)isready=4;}
 if(isready==1) {Serial.write("Direction 1/2: \n");    do{dir= Serial.readStringUntil('\n').toInt();isready=2;}while(dir<=0||dir>2);   }
-if(isready==2) {Serial.write("Steps /ne prekalqvai/: \n");do{steps= Serial.readStringUntil('\n').toInt();isready=3;}while(steps==0);   }
+if(isready==2) {Serial.write("Steps /ne prekalqvai/: o]\n");do{steps= Serial.readStringUntil('\n').toInt();isready=3;}while(steps==0);   }
 
 
 if(isready==3) {
@@ -113,10 +115,18 @@ Serial.print(choice); Serial.print(dir); Serial.print(steps); isready=0;
 ChooseMotor(choice,dir,steps);
 }
 if(isready=4) {
-  if (joyx>800 ) {dir=2;choice=1;Serial.print(choice); Serial.print(dir); Serial.print(steps);ChooseMotor(choice,dir,10);isready=0;}
-  if (joyx<200 ) {dir=1;choice=1;Serial.print(choice); Serial.print(dir); Serial.print(steps);ChooseMotor(choice,dir,10); isready=0;}
+  int joyvaluex = (joyx-512)/15;
+  int joyvaluey = (joyy-512)/15;
+  int dirx = 2;
+  int diry = 2;
+  if (joyvaluex < 0) {dir=1; joyvaluex = -joyvaluex;}
+  if (joyvaluey < 0) {dir=1; joyvaluey = -joyvaluey;}
+  int joyspeedx = 35-joyvaluex;
+  int joyspeedy = 35-joyvaluey;
+  if (joyx>600 ) {dir=2;choice=1;/*Serial.print(choice); Serial.print(dir); Serial.print(steps);*/ChooseMotor(choice,dir,_joysteps,joyspeedx);isready=0;}
+  if (joyx<400 ) {dir=1;choice=1;/*Serial.print(choice); Serial.print(dir); Serial.print(steps);*/ChooseMotor(choice,dir,_joysteps,joyspeedx); isready=0;}
 
-  if (joyy>800 ) {dir=2;choice=2;Serial.print(choice); Serial.print(dir); Serial.print(steps);ChooseMotor(choice,dir,10); isready=0;}
-  if (joyy<200 ) {dir=1;choice=2;Serial.print(choice); Serial.print(dir); Serial.print(steps);ChooseMotor(choice,dir,10); isready=0;} 
+  if (joyy>600 ) {dir=2;choice=2;/*Serial.print(choice); Serial.print(dir); Serial.print(steps);*/ChooseMotor(choice,dir,_joysteps,joyspeedy); isready=0;}
+  if (joyy<400 ) {dir=1;choice=2;/*Serial.print(choice); Serial.print(dir); Serial.print(steps);*/ChooseMotor(choice,dir,_joysteps,joyspeedy); isready=0;} 
 }
 }

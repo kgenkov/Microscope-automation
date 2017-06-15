@@ -39,7 +39,7 @@ int Disable_movement()
 {PORTD=PORTD|B10000000;
 return 0;
   }
-int ChooseMotor(int choice, int dir, int steps, int MovSpeed=1)
+int ChooseMotor(int choice, int dir, int steps, int MovSpeed=1000)
 {
   
  if (choice==1)TurnOnMotorX(dir, steps,MovSpeed);
@@ -56,7 +56,7 @@ int TurnOnMotorX(int dir, int steps,int MovSpeed)
   for (i=1;i<=2*steps;i++)
   {
     PORTB=PORTB ^ B100000;
-    delay(MovSpeed);
+    delayMicroseconds(MovSpeed);
  
   }
  PORTB=B000000;
@@ -72,7 +72,7 @@ int TurnOnMotorY(int dir, int steps,int MovSpeed)
   for (i=1;i<=2*steps;i++)
   {
     PORTB=PORTB ^ B001000;
-    delay(MovSpeed);
+    delayMicroseconds(MovSpeed);
   }
  PORTB=B000000; 
  Disable_movement();  
@@ -87,7 +87,7 @@ int TurnOnMotorZ(int dir, int steps,int MovSpeed)
   for (i=1;i<=2*steps;i++)
   {
     PORTB=PORTB ^ B000010;
-    delay(MovSpeed);
+    delayMicroseconds(MovSpeed);
   }
  PORTB=B000000;
  Disable_movement();  
@@ -121,12 +121,13 @@ if(isready=4) {
   int diry = 2;
   if (joyvaluex < 0) {dir=1; joyvaluex = -joyvaluex;}
   if (joyvaluey < 0) {dir=1; joyvaluey = -joyvaluey;}
-  int joyspeedx = 35-joyvaluex;
-  int joyspeedy = 35-joyvaluey;
+  int joyspeedx = 256*(35-joyvaluex);
+  int joyspeedy = 256*(35-joyvaluey);
+  int joyspeed = min (joyspeedx, joyspeedy);
   if (joyx>600 ) {dir=2;choice=1;/*Serial.print(choice); Serial.print(dir); Serial.print(steps);*/ChooseMotor(choice,dir,_joysteps,joyspeedx);isready=0;}
   if (joyx<400 ) {dir=1;choice=1;/*Serial.print(choice); Serial.print(dir); Serial.print(steps);*/ChooseMotor(choice,dir,_joysteps,joyspeedx); isready=0;}
 
   if (joyy>600 ) {dir=2;choice=2;/*Serial.print(choice); Serial.print(dir); Serial.print(steps);*/ChooseMotor(choice,dir,_joysteps,joyspeedy); isready=0;}
   if (joyy<400 ) {dir=1;choice=2;/*Serial.print(choice); Serial.print(dir); Serial.print(steps);*/ChooseMotor(choice,dir,_joysteps,joyspeedy); isready=0;} 
 }
-}
+} 
